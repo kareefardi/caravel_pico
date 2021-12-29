@@ -23,7 +23,7 @@ __check_defined = \
 		      $(if $(value $1),, \
 		            $(error Undefined $1$(if $2, ($2))))
 
-$(call check_defined, PDK_ROOT, CARAVEL_PICO_ROOT, CARAVEL_ROOT, are missing export or define them)
+$(call check_defined, PDK_ROOT CARAVEL_PICO_ROOT CARAVEL_ROOT,export or define them)
 
 PDK_PATH = $(PDK_ROOT)/sky130A
 VERILOG_PATH = $(CARAVEL_PICO_ROOT)/verilog
@@ -38,9 +38,9 @@ CARAVEL_VERILOG_PATH = $(CARVEL_ROOT)/verilog
 # ---- Compiler Information ----
 
 # GCC_PATH
-$(call check_defined, GCC_PATH, GCC_PREFIX, are missing export or define them)
+# GCC_PREFIX?=riscv32-unknown-linux-gnu
+$(call check_defined, GCC_PATH GCC_PREFIX, are missing export or define them)
 
-GCC_PREFIX?=riscv32-unknown-linux-gnu
 
 
 
