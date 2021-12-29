@@ -28,7 +28,7 @@
 
     `ifdef  EF_STYLE 
 	`include "libs.ref/verilog/sky130_fd_io/sky130_fd_io.v"
-//	`include "libs.ref/verilog/sky130_fd_io/sky130_ef_io.v"
+	`include "libs.ref/verilog/sky130_fd_io/sky130_ef_io.v"
 
 	`include "libs.ref/verilog/sky130_fd_sc_hd/primitives.v"
 	`include "libs.ref/verilog/sky130_fd_sc_hd/sky130_fd_sc_hd.v"
@@ -37,7 +37,7 @@
 	`include "libs.ref/verilog/sky130_sram_macros/sky130_sram_2kbyte_1rw1r_32x512_8.v"
     `else 
 	`include "libs.ref/sky130_fd_io/verilog/sky130_fd_io.v"
-//	`include "libs.ref/sky130_fd_io/verilog/sky130_ef_io.v"
+	`include "libs.ref/sky130_fd_io/verilog/sky130_ef_io.v"
 
 	`include "libs.ref/sky130_fd_sc_hd/verilog/primitives.v"
 	`include "libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v"
@@ -70,6 +70,8 @@
 		
     `else
 	`include "digital_pll.v"
+	`include "digital_pll_controller.v"
+	`include "ring_osc2x13.v"
 	`include "caravel_clocking.v"
 	`include "user_id_programming.v"
 	`include "clock_div.v"

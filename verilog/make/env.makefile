@@ -32,7 +32,7 @@ FIRMWARE_PATH = $(VERILOG_PATH)/dv/firmware
 
 # ---- Caravel Integration Information ----
 
-CARAVEL_VERILOG_PATH = $(CARVEL_ROOT)/verilog
+CARAVEL_VERILOG_PATH = $(CARAVEL_ROOT)/verilog
 
 
 # ---- Compiler Information ----
