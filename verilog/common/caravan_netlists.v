@@ -27,7 +27,7 @@
     /* NOTE: Need to pass the PDK root directory to iverilog with option -I */
     `ifdef EF_STYLE // efabless style pdk installation; mainly for open galaxy users
 	`include "libs.ref/verilog/sky130_fd_io/sky130_fd_io.v"
-//	`include "libs.ref/verilog/sky130_fd_io/sky130_ef_io.v"
+	`include "libs.ref/verilog/sky130_fd_io/sky130_ef_io.v"
 
 	`include "libs.ref/verilog/sky130_fd_sc_hd/primitives.v"
 	`include "libs.ref/verilog/sky130_fd_sc_hd/sky130_fd_sc_hd.v"
@@ -36,7 +36,7 @@
 	`include "libs.ref/verilog/sky130_sram_macros/sky130_sram_2kbyte_1rw1r_32x512_8.v"
     `else 
 	`include "libs.ref/sky130_fd_io/verilog/sky130_fd_io.v"
-//	`include "libs.ref/sky130_fd_io/verilog/sky130_ef_io.v"
+	`include "libs.ref/sky130_fd_io/verilog/sky130_ef_io.v"
 
 	`include "libs.ref/sky130_fd_sc_hd/verilog/primitives.v"
 	`include "libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v"
@@ -52,7 +52,6 @@
 	`include "gl/mgmt_core.v"
 	`include "gl/digital_pll.v"
 	`include "gl/DFFRAM.v"
-	`include "gl/storage.v"
 	`include "gl/user_id_programming.v"
 	`include "gl/chip_io_alt.v"
 	`include "gl/mprj_logic_high.v"
@@ -66,6 +65,10 @@
 	`include "gl/spare_logic_block.v"
 	`include "gl/mgmt_core_wrapper.v"
 	`include "gl/caravan.v"
+	`include "gl/housekeeping.v"
+	`include "gl/caravel_clocking.v"
+	`include "gl/gpio_defaults_block_1803.v"
+	`include "gl/gpio_defaults_block_0403.v"
     `else
 	`include "digital_pll.v"
 	`include "caravel_clocking.v"
@@ -86,6 +89,8 @@
 	`include "spare_logic_block.v"
 	`include "mgmt_core_wrapper.v"
 	`include "caravan.v"
+	`include "digital_pll_controller.v"
+	`include "ring_osc2x13.v"
     `endif
 
     `include "simple_por.v"
