@@ -16,19 +16,30 @@
 
 # ---- Environment Variables ----
 
+check_defined = \
+		    $(strip $(foreach 1,$1, \
+		            $(call __check_defined,$1,$(strip $(value 2)))))
+__check_defined = \
+		      $(if $(value $1),, \
+		            $(error Undefined $1$(if $2, ($2))))
+
+$(call check_defined, PDK_ROOT, CARAVEL_PICO_ROOT, CARAVEL_ROOT, are missing export or define them)
+
 PDK_PATH = $(PDK_ROOT)/sky130A
-VERILOG_PATH = ../../..
+VERILOG_PATH = $(CARAVEL_PICO_ROOT)/verilog
 VIP_PATH = $(VERILOG_PATH)/dv/vip
 FIRMWARE_PATH = $(VERILOG_PATH)/dv/firmware
 
 # ---- Caravel Integration Information ----
 
-CARAVEL_VERILOG_PATH = $(DESIGNS)/caravel_openframe/verilog
+CARAVEL_VERILOG_PATH = $(CARVEL_ROOT)/verilog
 
 
 # ---- Compiler Information ----
 
-GCC_PATH?=$(TOOLS)/bin
+# GCC_PATH
+$(call check_defined, GCC_PATH, GCC_PREFIX, are missing export or define them)
+
 GCC_PREFIX?=riscv32-unknown-linux-gnu
 
 

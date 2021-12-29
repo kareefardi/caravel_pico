@@ -18,16 +18,14 @@
 
 SIM_DEFINES = -DFUNCTIONAL -DSIM
 
-# RTL/GL/GL_SDF
 SIM?=RTL
+SIMS = RTL GL GL_SDF
 
-all:  ${BLOCKS:=.vcd}
+VCDS = RTL.vcd GL.vcd
+VVPS = $(foreach i,$(SIMS),$(i).vvp)
+ALL: GL_SDF RTL GL
 
-hex:  ${BLOCKS:=.hex}
-
-#.SUFFIXES:
-
-%.elf: %.c $(LINKER_SCRIPT) $(SOURCE_FILES) check-env
+%.elf: %.c $(LINKER_SCRIPT) $(SOURCE_FILES) 
 	${GCC_PATH}/${GCC_PREFIX}-gcc -I$(FIRMWARE_PATH) -march=rv32imc -mabi=ilp32 \
 	-Wl,-Bstatic,-T,$(LINKER_SCRIPT),--strip-debug \
 	-ffreestanding -nostdlib -o $@ $(SOURCE_FILES) $<
@@ -40,18 +38,26 @@ hex:  ${BLOCKS:=.hex}
 %.bin: %.elf
 	${GCC_PATH}/${GCC_PREFIX}-objcopy -O binary $< /dev/stdout | tail -c +1048577 > $@
 
-%.vvp: %_tb.v %.hex
-ifeq ($(SIM),RTL)
+.PHONY: RTL
+.PHONY: RTL.vcd 
+RTL.vcd : $(BLOCKS)_tb.v $(BLOCKS).hex
+	# this is RTL
 	iverilog -Ttyp $(SIM_DEFINES) -I $(VIP_PATH) \
-	-I $(PDK_PATH) -I $(VERILOG_PATH)/common -I $(VERILOG_PATH)/rtl  -I $(CARAVEL_VERILOG_PATH)/rtl \
-	$< -o $@ 
-endif 
-ifeq ($(SIM),GL)
+		-I $(PDK_PATH) -I $(VERILOG_PATH)/common -I $(VERILOG_PATH)/rtl  -I $(CARAVEL_VERILOG_PATH)/rtl \
+		$< -o $@ 
+
+.PHONY: GL
+.PHONY: GL.vcd 
+GL.vcd : $(BLOCKS)_tb.v $(BLOCKS).hex
+	# this is GL
 	iverilog -Ttyp $(SIM_DEFINES) -DGL -I $(VIP_PATH) \
-	-I $(PDK_PATH) -I $(VERILOG_PATH)/common -I $(VERILOG_PATH)  -I $(CARAVEL_VERILOG_PATH) -I $(CARAVEL_VERILOG_PATH)/rtl  \
-	$< -o $@ 
-endif 
-ifeq ($(SIM),GL_SDF)
+		-I $(PDK_PATH) -I $(VERILOG_PATH)/common -I $(VERILOG_PATH)  -I $(CARAVEL_VERILOG_PATH) -I $(CARAVEL_VERILOG_PATH)/rtl  \
+		$< -o $@ 
+
+.PHONY: GL_SDF
+.PHONY: GL_SDF.vvp
+GL_SDF.vvp : $(BLOCKS)_tb.v $(BLOCKS).hex
+	# this is GL_SDF
 	$(eval VIP_PATH := $(shell realpath --relative-to=$(shell pwd) $(VIP_PATH)))
 	$(eval COMMON_ABSOLUTE_PATH := $(shell realpath --relative-to=$(shell pwd) $(VERILOG_PATH)/common))
 	$(eval PDK_ABSOLUTE_PATH := $(shell realpath --relative-to=$(shell pwd) $(PDK_PATH)))
@@ -61,27 +67,18 @@ ifeq ($(SIM),GL_SDF)
 	$(eval CURRENT_DIRECTORY := $(shell pwd))
 	
 	cvc +interp +incdir+$(COMMON_ABSOLUTE_PATH)+$(VIP_PATH)+$(VERILOG_ABSOLUTE_PATH)+$(RTL_ABSOLUTE_PATH)+$(CARAVEL_VERILOG_ABSOLUTE_PATH)+$(CARAVEL_VERILOG_ABSOLUTE_PATH)/rtl+$(PDK_ABSOLUTE_PATH)+$(CURRENT_DIRECTORY) \
-	    +define+FUNCTIONAL +define+SIM +define+GL +define+USE_POWER_PINS +define+ENABLE_SDF +change_port_type +dump2fst $<
-endif
+	    +define+FUNCTIONAL +define+SIM +define+GL +define+USE_POWER_PINS +define+ENABLE_SDF +change_port_type +dump2fst $< | tee @.log
 
-%.vcd: %.vvp
-	vvp $<
+GL_SDF : % : %.vvp
+	# GL_SDF done simulation $(BLOCKS)
+	
+
+RTL GL : % : %.vvp
+	# RTL GL done simulating $(BLOCKS)
 
 
-check-env:
-ifndef PDK_ROOT
-	$(error PDK_ROOT is undefined, please export it before running make)
-endif
-ifeq (,$(wildcard $(PDK_ROOT)/sky130A))
-	$(error $(PDK_ROOT)/sky130A not found, please install pdk before running make)
-endif
-ifeq (,$(wildcard $(GCC_PATH)/$(GCC_PREFIX)-gcc ))
-	$(error $(GCC_PATH)/$(GCC_PREFIX)-gcc is not found, please export GCC_PATH and GCC_PREFIX before running make)
-endif
-# check for efabless style installation
-ifeq (,$(wildcard $(PDK_ROOT)/sky130A/libs.ref/*/verilog))
-SIM_DEFINES := ${SIM_DEFINES} -DEF_STYLE
-endif
+RTL.vvp GL.vvp : %.vvp : %.vcd
+	vvp $< | tee $<.log
 
 
 # ---- Clean ----
